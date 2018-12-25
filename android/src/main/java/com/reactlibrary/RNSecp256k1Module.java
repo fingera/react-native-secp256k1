@@ -43,9 +43,9 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] dataraw = Base64.decode(data, Base64.DEFAULT);
-                    byte[] signatureraw = Base64.decode(signature, Base64.DEFAULT);
-                    byte[] pubraw = Base64.decode(pub, Base64.DEFAULT);
+                    byte[] dataraw = Base64.decode(data, Base64.NO_PADDING);
+                    byte[] signatureraw = Base64.decode(signature, Base64.NO_PADDING);
+                    byte[] pubraw = Base64.decode(pub, Base64.NO_PADDING);
 
                     promise.resolve(NativeSecp256k1.verify(dataraw, signatureraw, pubraw));
                 } catch (Exception ex) {
@@ -62,11 +62,11 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] dataraw = Base64.decode(data, Base64.DEFAULT);
-                    byte[] privraw = Base64.decode(priv, Base64.DEFAULT);
+                    byte[] dataraw = Base64.decode(data, Base64.NO_PADDING);
+                    byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
                     byte[] signatureraw = NativeSecp256k1.sign(dataraw, privraw);
 
-                    promise.resolve(Base64.encode(signatureraw, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(signatureraw, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
@@ -80,7 +80,7 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] privraw = Base64.decode(priv, Base64.DEFAULT);
+                    byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
                     promise.resolve(NativeSecp256k1.secKeyVerify(privraw));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
@@ -95,9 +95,9 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] privraw = Base64.decode(priv, Base64.DEFAULT);
+                    byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
                     byte[] pubraw = NativeSecp256k1.computePubkey(privraw);
-                    promise.resolve(Base64.encode(pubraw, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(pubraw, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
@@ -111,10 +111,10 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] privraw = Base64.decode(priv, Base64.DEFAULT);
-                    byte[] pubraw = Base64.decode(pub, Base64.DEFAULT);
+                    byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
+                    byte[] pubraw = Base64.decode(pub, Base64.NO_PADDING);
                     byte[] secretraw = NativeSecp256k1.createECDHSecret(privraw, pubraw);
-                    promise.resolve(Base64.encode(secretraw, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(secretraw, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
@@ -128,7 +128,7 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] randomraw = Base64.decode(random, Base64.DEFAULT);
+                    byte[] randomraw = Base64.decode(random, Base64.NO_PADDING);
                     promise.resolve(NativeSecp256k1.randomize(randomraw));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
@@ -143,10 +143,10 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] privraw = Base64.decode(priv, Base64.DEFAULT);
-                    byte[] tweakraw = Base64.decode(tweak, Base64.DEFAULT);
+                    byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
+                    byte[] tweakraw = Base64.decode(tweak, Base64.NO_PADDING);
                     byte[] result = NativeSecp256k1.privKeyTweakMul(privraw, tweakraw);
-                    promise.resolve(Base64.encode(result, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(result, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
@@ -160,10 +160,10 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] privraw = Base64.decode(priv, Base64.DEFAULT);
-                    byte[] tweakraw = Base64.decode(tweak, Base64.DEFAULT);
+                    byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
+                    byte[] tweakraw = Base64.decode(tweak, Base64.NO_PADDING);
                     byte[] result = NativeSecp256k1.privKeyTweakAdd(privraw, tweakraw);
-                    promise.resolve(Base64.encode(result, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(result, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
@@ -177,10 +177,10 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] pubraw = Base64.decode(pub, Base64.DEFAULT);
-                    byte[] tweakraw = Base64.decode(tweak, Base64.DEFAULT);
+                    byte[] pubraw = Base64.decode(pub, Base64.NO_PADDING);
+                    byte[] tweakraw = Base64.decode(tweak, Base64.NO_PADDING);
                     byte[] result = NativeSecp256k1.pubKeyTweakMul(pubraw, tweakraw);
-                    promise.resolve(Base64.encode(result, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(result, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
@@ -194,10 +194,10 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 try {
-                    byte[] pubraw = Base64.decode(pub, Base64.DEFAULT);
-                    byte[] tweakraw = Base64.decode(tweak, Base64.DEFAULT);
+                    byte[] pubraw = Base64.decode(pub, Base64.NO_PADDING);
+                    byte[] tweakraw = Base64.decode(tweak, Base64.NO_PADDING);
                     byte[] result = NativeSecp256k1.pubKeyTweakAdd(pubraw, tweakraw);
-                    promise.resolve(Base64.encode(result, Base64.DEFAULT));
+                    promise.resolve(Base64.encode(result, Base64.NO_PADDING));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
                 }
