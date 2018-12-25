@@ -1,6 +1,7 @@
 
 package com.reactlibrary;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -18,5 +19,10 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
   @Override
   public String getName() {
     return "RNSecp256k1";
+  }
+
+  @ReactMethod
+  public void createECDHSecret(final String privateKey, final String publicKey, final Promise promise) {
+      promise.resolve("Hello");
   }
 }

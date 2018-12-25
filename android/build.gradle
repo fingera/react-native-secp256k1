@@ -13,7 +13,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 16
@@ -28,7 +28,7 @@ android {
         main {
             java {
                 srcDir "../external/secp256k1/src/java"
-                exclude "../external/secp256k1/src/java/org/bitcoin/NativeSecp256k1Test.java"
+                exclude "**/NativeSecp256k1Test.java"
             }
         }
     }
@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.google.guava:guava:+'
+    implementation 'com.facebook.react:react-native:+'
+    implementation 'com.google.guava:guava:27.0.1-android'
 }
   

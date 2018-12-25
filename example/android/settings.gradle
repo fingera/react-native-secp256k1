@@ -1,0 +1,4 @@
+rootProject.name = 'example'
+include ':react-native-secp256k1'
+project(':react-native-secp256k1').projectDir = new File(rootProject.projectDir, '../../android')
+include ':app'
