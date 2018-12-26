@@ -2,6 +2,7 @@
 #import "RNSecp256k1.h"
 
 #include "secp256k1.h"
+#include "secp256k1_ecdh.h"
 
 @implementation RNSecp256k1
 
@@ -153,6 +154,10 @@ secp256k1_context *kSecp256k1Context = nil;
 {
     return @{ @"isEnabled": @TRUE };
 }
++ (BOOL)requiresMainQueueSetup
+{
+    return YES;
+}
 RCT_EXPORT_MODULE()
 
 
@@ -171,13 +176,29 @@ static size_t decode_base64(NSString *str, void *buf) {
 RCT_EXPORT_METHOD(verify:(NSString *)data sig:(NSString *)sig pub:(NSString *)pub resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSData *rawdata = [[NSData alloc] initWithBase64EncodedString:data options:NSDataBase64DecodingIgnoreUnknownCharacters];
-        NSData *rawsig = [[NSData alloc] initWithBase64EncodedString:sig options:NSDataBase64DecodingIgnoreUnknownCharacters];
-        NSData *rawpub = [[NSData alloc] initWithBase64EncodedString:pub options:NSDataBase64DecodingIgnoreUnknownCharacters];
-        if (rawdata == nil || rawsig == nil || rawpub == nil) {
-            resolve(@FALSE);
+        unsigned char rawData[kMaxBufferLength];
+        unsigned char rawSig[kMaxBufferLength];
+        unsigned char rawPub[kMaxBufferLength];
+        size_t rawDataLen = decode_base64(data, rawData);
+        size_t rawSigLen = decode_base64(sig, rawSig);
+        size_t rawPubLen = decode_base64(pub, rawPub);
+        if (rawDataLen != 32 || rawSigLen == 0 || rawPubLen == 0) {
+            reject(@"Error", @"Data or Sig or Pubkey invalid", nil);
             return;
         }
+        
+        secp256k1_ecdsa_signature sig;
+        secp256k1_pubkey pubkey;
+        if (!secp256k1_ecdsa_signature_parse_der(kSecp256k1Context, &sig, rawSig, rawSigLen)) {
+            reject(@"Error", @"signature invalid", nil);
+            return;
+        }
+        if (!secp256k1_ec_pubkey_parse(kSecp256k1Context, &pubkey, rawPub, rawPubLen)) {
+            reject(@"Error", @"pubkey invalid", nil);
+            return;
+        }
+        int r = secp256k1_ecdsa_verify(kSecp256k1Context, &sig, rawData, &pubkey);
+        resolve([NSNumber numberWithInt:r]);
     });
 }
 
@@ -244,6 +265,34 @@ RCT_EXPORT_METHOD(computePubkey:(NSString *)priv compress:(BOOL)compress  resolv
         to_base64(rawPub, rawPubLen, basePub);
         basePub[to_base64_len(rawPubLen)] = 0;
         resolve([NSString stringWithUTF8String:basePub]);
+    });
+}
+
+RCT_EXPORT_METHOD(createECDHSecret:(NSString *)priv priv:(NSString *)pub resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        unsigned char rawPub[kMaxBufferLength];
+        unsigned char rawPriv[kMaxBufferLength];
+        size_t rawPubLen = decode_base64(pub, rawPub);
+        size_t rawPrivLen = decode_base64(priv, rawPriv);
+        if (rawPubLen == 0 || rawPrivLen != 32) {
+            reject(@"Error", @"Pub or Key invalid", nil);
+            return;
+        }
+        secp256k1_pubkey pubkey;
+        if (!secp256k1_ec_pubkey_parse(kSecp256k1Context, &pubkey, rawPub, rawPubLen)) {
+            reject(@"Error", @"pubkey invalid", nil);
+            return;
+        }
+        unsigned char nonce_res[32];
+        if (!secp256k1_ecdh(kSecp256k1Context, nonce_res, &pubkey, rawPriv, NULL, NULL)) {
+            reject(@"Error", @"generate", nil);
+            return;
+        }
+        char baseSecret[256];
+        to_base64(nonce_res, 32, baseSecret);
+        baseSecret[to_base64_len(32)] = 0;
+        resolve([NSString stringWithUTF8String:baseSecret]);
     });
 }
 
