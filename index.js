@@ -97,7 +97,7 @@ RNSecp256k1.raw_secKeyVerify = async function (priv) {
 }
 RNSecp256k1.raw_computePubkey = async function (priv) {
   const bPriv = base64_encode(priv);
-  const bPub = await RNSecp256k1.computePubkey(bPriv);
+  const bPub = await RNSecp256k1.computePubkey(bPriv, true);
   return base64_decode(bPub);
 }
 

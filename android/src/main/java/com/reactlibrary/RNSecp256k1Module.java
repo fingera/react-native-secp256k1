@@ -90,13 +90,13 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void computePubkey(final String priv, final Promise promise) {
+    public void computePubkey(final String priv, final boolean compressed, final Promise promise) {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
-                    byte[] pubraw = NativeSecp256k1.computePubkey(privraw);
+                    byte[] pubraw = NativeSecp256k1.computePubkey(privraw, compressed);
                     promise.resolve(Base64.encodeToString(pubraw, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
                     promise.reject("Error", ex.getMessage());
