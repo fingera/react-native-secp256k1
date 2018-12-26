@@ -4,6 +4,38 @@ import { NativeModules } from 'react-native';
 const { RNSecp256k1 } = NativeModules;
 
 
+////////////////////////////////////// hex /////////////////////////////////////
+function to_hex_value(c) {
+  if (c >= 0x30 && c <= 0x39) return c - 0x30;
+  if (c >= 0x41 && c <= 0x5A) return (c - 0x41) + 10;
+  if (c >= 0x61 && c <= 0x7A) return (c - 0x61) + 10;
+  return 0;
+}
+function hex_decode(str) {
+  const bytes = [];
+  let len = str.length;
+  if (len % 2 === 1) len--; // ingore single char
+  for (let i = 0; i < len; i += 2) {
+    const c1 = to_hex_value(str.charCodeAt(i));
+    const c2 = to_hex_value(str.charCodeAt(i + 1));
+    bytes.push(c2 | (c1 << 4));
+  }
+  return bytes;
+}
+const hex_str = "0123456789ABCDEF";
+function hex_encode(bytes) {
+  let str = "";
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i];
+    str += hex_str[b >> 4];
+    str += hex_str[b & 0xF];
+  }
+  return str;
+}
+RNSecp256k1.hex_encode = hex_encode;
+RNSecp256k1.hex_decode = hex_decode;
+
+//////////////////////////////////// base64 ////////////////////////////////////
 const to_char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const from_char = [];
 for (let i = 0; i < to_char.length; i++) {
@@ -73,8 +105,6 @@ function base64_decode(str) {
   return bytes;
 }
 
-console.log(base64_decode("BIS/dWImK71pQAhXSPO+avpSrjFxVRgezjG2Y1HM/6SwjMQ9Y7KFnUaf7hXzHJ7bUyQmbm/QQH6HOC1g/EURrNg"));
-
 RNSecp256k1.base64_decode = base64_decode;
 RNSecp256k1.base64_encode = base64_encode;
 
@@ -94,14 +124,45 @@ RNSecp256k1.raw_sign = async function (data, priv) {
 RNSecp256k1.raw_secKeyVerify = async function (priv) {
   const bPriv = base64_encode(priv);
   return await RNSecp256k1.secKeyVerify(bPriv);
-}
-RNSecp256k1.raw_computePubkey = async function (priv) {
+};
+RNSecp256k1.raw_computePubkey = async function (priv, compressed) {
   const bPriv = base64_encode(priv);
-  const bPub = await RNSecp256k1.computePubkey(bPriv, true);
+  const bPub = await RNSecp256k1.computePubkey(bPriv, compressed ? true : false);
   return base64_decode(bPub);
-}
-
-
-
+};
+RNSecp256k1.raw_createECDHSecret = async function (priv, pub) {
+  const bPriv = base64_encode(priv);
+  const bPub = base64_encode(pub);
+  const bSecret = await RNSecp256k1.createECDHSecret(bPriv, bPub);
+  return base64_decode(bSecret);
+};
+RNSecp256k1.raw_randomize = async function (random) {
+  const bRandom = base64_encode(random);
+  return await RNSecp256k1.randomize(bRandom);
+};
+RNSecp256k1.raw_privKeyTweakMul = async function (priv, tweak) {
+  const bPriv = base64_encode(priv);
+  const bTweak = base64_encode(tweak);
+  const bResult = await RNSecp256k1.privKeyTweakMul(bPriv, bTweak);
+  return base64_decode(bResult);
+};
+RNSecp256k1.raw_privKeyTweakAdd = async function (priv, tweak) {
+  const bPriv = base64_encode(priv);
+  const bTweak = base64_encode(tweak);
+  const bResult = await RNSecp256k1.privKeyTweakAdd(bPriv, bTweak);
+  return base64_decode(bResult);
+};
+RNSecp256k1.raw_pubKeyTweakMul = async function (pub, tweak) {
+  const bPub = base64_encode(pub);
+  const bTweak = base64_encode(tweak);
+  const bResult = await RNSecp256k1.pubKeyTweakMul(bPub, bTweak);
+  return base64_decode(bResult);
+};
+RNSecp256k1.raw_pubKeyTweakAdd = async function (pub, tweak) {
+  const bPub = base64_encode(pub);
+  const bTweak = base64_encode(tweak);
+  const bResult = await RNSecp256k1.pubKeyTweakAdd(bPub, bTweak);
+  return base64_decode(bResult);
+};
 
 export default RNSecp256k1;
