@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		687D336021D35CF1000D02F6 /* secp256k1.c in Sources */ = {isa = PBXBuildFile; fileRef = 687D335F21D35CF1000D02F6 /* secp256k1.c */; };
+		687D336621D4AB1F000D02F6 /* base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 687D336521D4AB1F000D02F6 /* base64.m */; };
+		687D336921D4AE5A000D02F6 /* RNSecp256k1Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 687D336821D4AE5A000D02F6 /* RNSecp256k1Ext.m */; };
 		B3E7B58A1CC2AC0600A0062D /* RNSecp256k1.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNSecp256k1.m */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +28,10 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNSecp256k1.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNSecp256k1.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		687D335F21D35CF1000D02F6 /* secp256k1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = secp256k1.c; path = ../external/secp256k1/src/secp256k1.c; sourceTree = "<group>"; };
+		687D336421D4AB1F000D02F6 /* base64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
+		687D336521D4AB1F000D02F6 /* base64.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = base64.m; sourceTree = "<group>"; };
+		687D336721D4AE5A000D02F6 /* RNSecp256k1Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNSecp256k1Ext.h; sourceTree = "<group>"; };
+		687D336821D4AE5A000D02F6 /* RNSecp256k1Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNSecp256k1Ext.m; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNSecp256k1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNSecp256k1.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNSecp256k1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNSecp256k1.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,6 +58,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				687D336721D4AE5A000D02F6 /* RNSecp256k1Ext.h */,
+				687D336821D4AE5A000D02F6 /* RNSecp256k1Ext.m */,
+				687D336421D4AB1F000D02F6 /* base64.h */,
+				687D336521D4AB1F000D02F6 /* base64.m */,
 				687D335F21D35CF1000D02F6 /* secp256k1.c */,
 				B3E7B5881CC2AC0600A0062D /* RNSecp256k1.h */,
 				B3E7B5891CC2AC0600A0062D /* RNSecp256k1.m */,
@@ -116,6 +126,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				687D336021D35CF1000D02F6 /* secp256k1.c in Sources */,
+				687D336621D4AB1F000D02F6 /* base64.m in Sources */,
+				687D336921D4AE5A000D02F6 /* RNSecp256k1Ext.m in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RNSecp256k1.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
