@@ -3,6 +3,7 @@ package com.reactlibrary;
 
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -11,8 +12,10 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 
 import org.bitcoin.NativeSecp256k1;
+import org.bitcoin.NativeSecp256k1Util;
 import org.bitcoin.Secp256k1Context;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +26,13 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
     public RNSecp256k1Module(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        byte[] values = new byte[32];
+        SecureRandom random = new SecureRandom();
+        try {
+            NativeSecp256k1.randomize(values);
+        } catch (NativeSecp256k1Util.AssertFailException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -49,7 +59,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
 
                     promise.resolve(NativeSecp256k1.verify(dataraw, signatureraw, pubraw));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
 
             }
@@ -68,7 +79,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
 
                     promise.resolve(Base64.encodeToString(signatureraw, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
@@ -83,7 +95,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] privraw = Base64.decode(priv, Base64.NO_PADDING);
                     promise.resolve(NativeSecp256k1.secKeyVerify(privraw));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
@@ -99,7 +112,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] pubraw = NativeSecp256k1.computePubkey(privraw, compressed);
                     promise.resolve(Base64.encodeToString(pubraw, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
@@ -116,12 +130,13 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] secretraw = NativeSecp256k1.createECDHSecret(privraw, pubraw);
                     promise.resolve(Base64.encodeToString(secretraw, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
     }
-
+/*
     @ReactMethod
     public void randomize(final String random, final Promise promise) {
         AsyncTask.execute(new Runnable() {
@@ -131,12 +146,13 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] randomraw = Base64.decode(random, Base64.NO_PADDING);
                     promise.resolve(NativeSecp256k1.randomize(randomraw));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
     }
-
+*/
     @ReactMethod
     public void privKeyTweakMul(final String priv, final String tweak, final Promise promise) {
         AsyncTask.execute(new Runnable() {
@@ -148,7 +164,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] result = NativeSecp256k1.privKeyTweakMul(privraw, tweakraw);
                     promise.resolve(Base64.encodeToString(result, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
@@ -165,7 +182,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] result = NativeSecp256k1.privKeyTweakAdd(privraw, tweakraw);
                     promise.resolve(Base64.encodeToString(result, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
@@ -182,7 +200,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] result = NativeSecp256k1.pubKeyTweakMul(pubraw, tweakraw);
                     promise.resolve(Base64.encodeToString(result, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });
@@ -199,7 +218,8 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
                     byte[] result = NativeSecp256k1.pubKeyTweakAdd(pubraw, tweakraw);
                     promise.resolve(Base64.encodeToString(result, Base64.NO_PADDING | Base64.NO_WRAP));
                 } catch (Exception ex) {
-                    promise.reject("Error", ex.getMessage());
+                    ex.printStackTrace();
+                    promise.reject("Error", ex.toString());
                 }
             }
         });

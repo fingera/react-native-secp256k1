@@ -136,10 +136,12 @@ RNSecp256k1.raw_createECDHSecret = async function (priv, pub) {
   const bSecret = await RNSecp256k1.createECDHSecret(bPriv, bPub);
   return base64_decode(bSecret);
 };
+/*
 RNSecp256k1.raw_randomize = async function (random) {
   const bRandom = base64_encode(random);
   return await RNSecp256k1.randomize(bRandom);
 };
+*/
 RNSecp256k1.raw_privKeyTweakMul = async function (priv, tweak) {
   const bPriv = base64_encode(priv);
   const bTweak = base64_encode(tweak);
