@@ -2,16 +2,22 @@
 {
   "name": "react-native-secp256k1",
   "version": "1.0.0",
-  "description": "",
+  "description": "bitcoin-core/secp256k1 working with react-native",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:fingera/react-native-secp256k1.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "react-native"
+    "react-native",
+    "secp256k1",
+    "bitcoin"
   ],
-  "author": "",
-  "license": "",
+  "author": "liuyujun",
+  "license": "MIT",
   "peerDependencies": {
     "react-native": "^0.41.2"
   }

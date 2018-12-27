@@ -37,9 +37,10 @@
 
 ## Usage
 ```javascript
-import RNSecp256k1 from 'react-native-secp256k1';
+import secp256k1 from 'react-native-secp256k1';
 
-// TODO: What to do with the module?
-RNSecp256k1;
+const data = secp256k1.hex_decode("CF80CD8AED482D5D1527D7DC72FCEFF84E6326592848447D2DC0B0E87DFC9A90");
+const priv = secp256k1.hex_decode("67E56582298859DDAE725F972992A07C6C4FB9F62A8FFF58CE3CA926A1063530");
+const sig = secp256k1.hex_encode(await secp256k1.raw_sign(data, priv));
 ```
   
