@@ -147,7 +147,16 @@ secp256k1_context *kSecp256k1Context = nil;
 
 - (dispatch_queue_t)methodQueue
 {
+    uint8_t seed[32];
+    int result = SecRandomCopyBytes(kSecRandomDefault, sizeof(seed), seed);
+    if(result != 0) {
+        NSLog(@"SecRandomCopyBytes failed for some reason");
+        for (int i = 0; i < sizeof(seed); i++) {
+            seed[i] = (uint8_t)rand();
+        }
+    }
     kSecp256k1Context = secp256k1_context_create(SECP256K1_FLAGS_BIT_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+    int r = secp256k1_context_randomize(kSecp256k1Context, seed); (void)r;
     return dispatch_get_main_queue();
 }
 - (NSDictionary *)constantsToExport
