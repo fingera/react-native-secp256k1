@@ -26,10 +26,9 @@ public class RNSecp256k1Module extends ReactContextBaseJavaModule {
     public RNSecp256k1Module(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        byte[] values = new byte[32];
         SecureRandom random = new SecureRandom();
         try {
-            NativeSecp256k1.randomize(values);
+            NativeSecp256k1.randomize(random.generateSeed(32));
         } catch (NativeSecp256k1Util.AssertFailException e) {
             e.printStackTrace();
         }
