@@ -1,7 +1,7 @@
 
 import { NativeModules } from 'react-native';
 
-const { RNSecp256k1 } = NativeModules;
+const { RNSecp256k1, RNSecp256k1Ext } = NativeModules;
 
 
 ////////////////////////////////////// hex /////////////////////////////////////
@@ -166,5 +166,7 @@ RNSecp256k1.raw_pubKeyTweakAdd = async function (pub, tweak) {
   const bResult = await RNSecp256k1.pubKeyTweakAdd(bPub, bTweak);
   return base64_decode(bResult);
 };
+
+RNSecp256k1.ext = RNSecp256k1Ext;
 
 export default RNSecp256k1;

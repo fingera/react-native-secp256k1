@@ -13,7 +13,7 @@ import com.facebook.react.bridge.JavaScriptModule;
 public class RNSecp256k1Package implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      return Arrays.<NativeModule>asList(new RNSecp256k1Module(reactContext));
+      return Arrays.<NativeModule>asList(new RNSecp256k1Module(reactContext), new RNSecp256k1Ext(reactContext));
     }
 
     // Deprecated from RN 0.47
