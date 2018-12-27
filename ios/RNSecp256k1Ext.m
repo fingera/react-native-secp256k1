@@ -58,7 +58,7 @@ RCT_EXPORT_METHOD(encryptECDH:(NSString *)priv pub:(NSString *)pub data:(NSStrin
         char *buffer = malloc(bufferSize);
         CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt, kCCAlgorithmAES,
                                               kCCOptionPKCS7Padding | kCCOptionECBMode,
-                                              ecdh, kCCBlockSizeAES128,
+                                              ecdh, kCCKeySizeAES256,
                                               NULL,
                                               [utf8 bytes], [utf8 length],
                                               buffer, bufferSize,
@@ -93,7 +93,7 @@ RCT_EXPORT_METHOD(decryptECDH:(NSString *)priv pub:(NSString *)pub data:(NSStrin
         size_t numBytesEncrypted = 0;
         CCCryptorStatus cryptStatus = CCCrypt(kCCDecrypt, kCCAlgorithmAES,
                                               kCCOptionPKCS7Padding | kCCOptionECBMode,
-                                              ecdh, kCCBlockSizeAES128,
+                                              ecdh, kCCKeySizeAES256,
                                               NULL,
                                               raw, rawLen,
                                               buffer, bufferSize,
