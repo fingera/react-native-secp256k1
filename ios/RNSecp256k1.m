@@ -215,7 +215,7 @@ RCT_EXPORT_METHOD(sign:(NSString *)data priv:(NSString *)priv  resolve:(RCTPromi
         }
         secp256k1_ecdsa_signature sig;
         if (!secp256k1_ecdsa_sign(kSecp256k1Context, &sig, rawData, rawPriv, NULL, NULL)) {
-            reject(@"Error", @"sign failure", nil);
+            resolve(@"");
             return;
         }
         unsigned char rawSig[72];
@@ -254,7 +254,7 @@ RCT_EXPORT_METHOD(computePubkey:(NSString *)priv compress:(BOOL)compress  resolv
         }
         secp256k1_pubkey pubkey;
         if (!secp256k1_ec_pubkey_create(kSecp256k1Context, &pubkey, rawPriv)) {
-            reject(@"Error", @"create failure", nil);
+            resolve(@"");
             return;
         }
         unsigned char rawPub[65];
@@ -265,6 +265,104 @@ RCT_EXPORT_METHOD(computePubkey:(NSString *)priv compress:(BOOL)compress  resolv
         to_base64(rawPub, rawPubLen, basePub);
         basePub[to_base64_len(rawPubLen)] = 0;
         resolve([NSString stringWithUTF8String:basePub]);
+    });
+}
+
+RCT_EXPORT_METHOD(privKeyTweakAdd:(NSString *)priv data:(NSString *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        unsigned char rawData[kMaxBufferLength];
+        unsigned char rawPriv[kMaxBufferLength];
+        size_t rawDataLen = decode_base64(data, rawData);
+        size_t rawPrivLen = decode_base64(priv, rawPriv);
+        if (rawDataLen != 32 || rawPrivLen != 32) {
+            reject(@"Error", @"Priv or Data invalid", nil);
+            return;
+        }
+        int r = secp256k1_ec_privkey_tweak_add(kSecp256k1Context, rawPriv, rawData);
+        (void)r;
+        char baseSecret[256];
+        to_base64(rawPriv, 32, baseSecret);
+        baseSecret[to_base64_len(32)] = 0;
+        resolve([NSString stringWithUTF8String:baseSecret]);
+    });
+}
+
+RCT_EXPORT_METHOD(privKeyTweakMul:(NSString *)priv data:(NSString *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        unsigned char rawData[kMaxBufferLength];
+        unsigned char rawPriv[kMaxBufferLength];
+        size_t rawDataLen = decode_base64(data, rawData);
+        size_t rawPrivLen = decode_base64(priv, rawPriv);
+        if (rawDataLen != 32 || rawPrivLen != 32) {
+            reject(@"Error", @"Priv or Data invalid", nil);
+            return;
+        }
+        int r = secp256k1_ec_privkey_tweak_mul(kSecp256k1Context, rawPriv, rawData);
+        (void)r;
+        char baseSecret[256];
+        to_base64(rawPriv, 32, baseSecret);
+        baseSecret[to_base64_len(32)] = 0;
+        resolve([NSString stringWithUTF8String:baseSecret]);
+    });
+}
+
+RCT_EXPORT_METHOD(pubKeyTweakMul:(NSString *)pub data:(NSString *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        unsigned char rawData[kMaxBufferLength];
+        unsigned char rawPub[kMaxBufferLength];
+        size_t rawDataLen = decode_base64(data, rawData);
+        size_t rawPubLen = decode_base64(pub, rawPub);
+        if (rawDataLen != 32 || rawPubLen == 0) {
+            reject(@"Error", @"Priv or Data invalid", nil);
+            return;
+        }
+        secp256k1_pubkey pubkey;
+        if (!secp256k1_ec_pubkey_parse(kSecp256k1Context, &pubkey, rawPub, rawPubLen)) {
+            reject(@"Error", @"pubkey invalid", nil);
+            return;
+        }
+        int r = secp256k1_ec_pubkey_tweak_mul(kSecp256k1Context, &pubkey, rawData);
+        (void)r;
+        
+        unsigned int flags = rawPubLen == 33 ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED;
+        secp256k1_ec_pubkey_serialize(kSecp256k1Context, rawPub, &rawPubLen, &pubkey, flags);
+        
+        char baseSecret[256];
+        to_base64(rawPub, rawPubLen, baseSecret);
+        baseSecret[to_base64_len(rawPubLen)] = 0;
+        resolve([NSString stringWithUTF8String:baseSecret]);
+    });
+}
+
+RCT_EXPORT_METHOD(pubKeyTweakAdd:(NSString *)pub data:(NSString *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        unsigned char rawData[kMaxBufferLength];
+        unsigned char rawPub[kMaxBufferLength];
+        size_t rawDataLen = decode_base64(data, rawData);
+        size_t rawPubLen = decode_base64(pub, rawPub);
+        if (rawDataLen != 32 || rawPubLen == 0) {
+            reject(@"Error", @"Priv or Data invalid", nil);
+            return;
+        }
+        secp256k1_pubkey pubkey;
+        if (!secp256k1_ec_pubkey_parse(kSecp256k1Context, &pubkey, rawPub, rawPubLen)) {
+            reject(@"Error", @"pubkey invalid", nil);
+            return;
+        }
+        int r = secp256k1_ec_pubkey_tweak_add(kSecp256k1Context, &pubkey, rawData);
+        (void)r;
+        
+        unsigned int flags = rawPubLen == 33 ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED;
+        secp256k1_ec_pubkey_serialize(kSecp256k1Context, rawPub, &rawPubLen, &pubkey, flags);
+        
+        char baseSecret[256];
+        to_base64(rawPub, rawPubLen, baseSecret);
+        baseSecret[to_base64_len(rawPubLen)] = 0;
+        resolve([NSString stringWithUTF8String:baseSecret]);
     });
 }
 
