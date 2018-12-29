@@ -52,21 +52,27 @@ void ccc(bool encrypt, NSString *priv, NSString *pub, NSString *data, RCTPromise
             reject(@"Error", err, nil);
         }
         NSData *utf8 = [data dataUsingEncoding:NSUTF8StringEncoding];
-        const void *raw;
+        void *raw;
         size_t rawLen;
         if (encrypt) {
-            raw = [utf8 bytes];
-            rawLen = [utf8 length];
+            size_t paddingLen = 16 - ([utf8 length] % 16);
+            if (paddingLen < 2) paddingLen += 16;
+            paddingLen--;
+            rawLen = paddingLen + [utf8 length] + 1;
+            raw = malloc(rawLen);
+            *(uint8_t *)raw = (uint8_t)paddingLen;
+            int r = SecRandomCopyBytes(kSecRandomDefault, paddingLen, (uint8_t *)raw + 1); (void)r;
+            memcpy((uint8_t *)raw + paddingLen + 1, [utf8 bytes], [utf8 length]);
         } else {
             raw = malloc(from_base64_max_len([utf8 length]));
-            rawLen = from_base64([utf8 bytes], [utf8 length], (void *)raw);
+            rawLen = from_base64([utf8 bytes], [utf8 length], raw);
         }
         
         CCCryptorRef crypto = nil;
-        CCCryptorStatus status = CCCryptorCreate(encrypt ? kCCEncrypt : kCCDecrypt, kCCAlgorithmAES, kCCOptionPKCS7Padding | kCCOptionECBMode,
+        CCCryptorStatus status = CCCryptorCreate(encrypt ? kCCEncrypt : kCCDecrypt, kCCAlgorithmAES, 0,
                                                          ecdh, sizeof(ecdh), NULL, &crypto);
         if (status != kCCSuccess) {
-            if (!encrypt) free((void *)raw);
+            free(raw);
             if (crypto != nil) CCCryptorRelease(crypto);
             reject(@"Error", [NSString stringWithFormat:@"cryptor create error: %d", (int)status], nil);
             return;
@@ -77,7 +83,7 @@ void ccc(bool encrypt, NSString *priv, NSString *pub, NSString *data, RCTPromise
         char *out = malloc(outLen + 1);
         status = CCCryptorUpdate(crypto, raw, rawLen, out, outLen, &updateLen);
         if (status != kCCSuccess) {
-            if (!encrypt) free((void *)raw);
+            free(raw);
             CCCryptorRelease(crypto);
             free(out);
             reject(@"Error", [NSString stringWithFormat:@"cryptor update error: %d", (int)status], nil);
@@ -85,7 +91,7 @@ void ccc(bool encrypt, NSString *priv, NSString *pub, NSString *data, RCTPromise
         }
         status = CCCryptorFinal(crypto, out + updateLen, outLen - updateLen, &finalLen);
         if (status != kCCSuccess) {
-            if (!encrypt) free((void *)raw);
+            free(raw);
             CCCryptorRelease(crypto);
             free(out);
             reject(@"Error", [NSString stringWithFormat:@"cryptor final error: %d", (int)status], nil);
@@ -94,10 +100,16 @@ void ccc(bool encrypt, NSString *priv, NSString *pub, NSString *data, RCTPromise
         if (encrypt) {
             resolveBase64(resolve, out, updateLen + finalLen);
         } else {
-            out[updateLen + finalLen] = 0;
-            resolve([NSString stringWithUTF8String:out]);
+            size_t dataStart = (size_t)out[0] + 1;
+            size_t realLen = updateLen + finalLen;
+            if (realLen <= dataStart) {
+                reject(@"Error", @"Bad Data", nil);
+            } else {
+                out[updateLen + finalLen] = 0;
+                resolve([NSString stringWithUTF8String:out + dataStart]);
+            }
         }
-        if (!encrypt) free((void *)raw);
+        free(raw);
         CCCryptorRelease(crypto);
         free(out);
     });
