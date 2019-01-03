@@ -39,8 +39,31 @@
 ```javascript
 import secp256k1 from 'react-native-secp256k1';
 
-const data = secp256k1.hex_decode("CF80CD8AED482D5D1527D7DC72FCEFF84E6326592848447D2DC0B0E87DFC9A90");
-const priv = secp256k1.hex_decode("67E56582298859DDAE725F972992A07C6C4FB9F62A8FFF58CE3CA926A1063530");
-const sig = secp256k1.hex_encode(await secp256k1.raw_sign(data, priv));
+async function main() {
+	const privA = await secp256k1.ext.generateKey();
+	const privB = await secp256k1.ext.generateKey();
+
+	const pubA = await secp256k1.computePubkey(privA, true);
+	const pubB = await secp256k1.computePubkey(privB, true);
+
+	// sign verify
+	const data = "1H1SJuGwoSFTqNI8wvVWEdGRpBvTnzLckoZ1QTF7gI0";
+	const sigA = await secp256k1.sign(data, privA);
+	console.log("verify: ", await secp256k1.verify(data, sigA, pubA));
+
+	// ecdh && aes256
+	const encryped1 = await secp256k1.ext.encryptECDH(privA, pubB, "Hello World");
+	const decryped1 = await secp256k1.ext.decryptECDH(privB, pubA, encryped1);
+	console.log(decryped1);
+
+	// all: https://github.com/fingera/react-native-secp256k1-demo
+}
+
+main().then(() => {
+	console.log("Done");
+}).catch((err) => {
+	console.error(err);
+});
+
 ```
   

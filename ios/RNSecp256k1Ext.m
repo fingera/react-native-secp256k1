@@ -50,6 +50,7 @@ void ccc(bool encrypt, NSString *priv, NSString *pub, NSString *data, RCTPromise
         NSString *err = generateECDH(pub, priv, ecdh);
         if (err != nil) {
             reject(@"Error", err, nil);
+            return;
         }
         NSData *utf8 = [data dataUsingEncoding:NSUTF8StringEncoding];
         void *raw;
