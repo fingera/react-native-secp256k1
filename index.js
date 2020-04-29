@@ -11,7 +11,7 @@ function to_hex_value(c) {
   if (c >= 0x61 && c <= 0x7A) return (c - 0x61) + 10;
   return 0;
 }
-function hex_decode(str) {
+RNSecp256k1.hex_decode = function (str) {
   const bytes = [];
   let len = str.length;
   if (len % 2 === 1) len--; // ingore single char
@@ -23,7 +23,8 @@ function hex_decode(str) {
   return bytes;
 }
 const hex_str = "0123456789ABCDEF";
-function hex_encode(bytes) {
+
+RNSecp256k1.hex_encode = function (bytes) {
   let str = "";
   for (let i = 0; i < bytes.length; i++) {
     const b = bytes[i];
@@ -32,8 +33,6 @@ function hex_encode(bytes) {
   }
   return str;
 }
-RNSecp256k1.hex_encode = hex_encode;
-RNSecp256k1.hex_decode = hex_decode;
 
 //////////////////////////////////// base64 ////////////////////////////////////
 const to_char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -42,7 +41,7 @@ for (let i = 0; i < to_char.length; i++) {
   from_char[to_char.charCodeAt(i)] = i;
 }
 
-function base64_encode(byteArray) {
+RNSecp256k1.base64_encode = function (byteArray) {
   let result = "";
   const tail_len = byteArray.length % 3;
   const chunk_len = byteArray.length - tail_len;
@@ -66,7 +65,7 @@ function base64_encode(byteArray) {
   return result;
 }
 
-function base64_decode(str) {
+RNSecp256k1.base64_decode = function (str) {
   const bytes = [];
   let byte1, byte2, byte3, byte4;
   str = str.replace(/[\r\n\t ]/g, "");
@@ -104,9 +103,6 @@ function base64_decode(str) {
   }
   return bytes;
 }
-
-RNSecp256k1.base64_decode = base64_decode;
-RNSecp256k1.base64_encode = base64_encode;
 
 //////////////////////////////// raw interface ////////////////////////////////
 RNSecp256k1.raw_verify = async function (data, signature, pub) {
